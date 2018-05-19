@@ -1,6 +1,8 @@
 from django.urls import path
 from django.views import generic
 
+from catalog import views
+
 urlpatterns = [
-    path('', generic.TemplateView.as_view(template_name="catalog/index.html"), name='index'),
+    path('', views.BookListView.as_view(), name='books'),
 ]
