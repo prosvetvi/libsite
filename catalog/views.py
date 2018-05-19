@@ -1,4 +1,5 @@
 from django.views import generic
+from django.core.cache import cache
 
 from catalog.models import Book
 
@@ -14,4 +15,5 @@ class BookListView(generic.ListView):
         """
         Return the last reading books.
         """
-        return Book.objects.order_by('-read_date')[:3]
+        return cache.get_or_set('last_book_list', Book.objects.order_by('-read_date')[:3], 24 * 60 * 60)
+
