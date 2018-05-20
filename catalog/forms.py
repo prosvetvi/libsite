@@ -1,4 +1,4 @@
-from django.forms import ModelForm, SplitDateTimeWidget
+from django.forms import ModelForm, DateTimeInput
 
 from catalog.models import Book
 
@@ -6,7 +6,8 @@ from catalog.models import Book
 class BookForm(ModelForm):
     class Meta:
         model = Book
-        fields = ('title', "authors", "image", "file", "read_date", "can_download")
+        fields = ('title', "author", "image", "file", "read_date", "can_download")
         widgets = {
-            'read_date': SplitDateTimeWidget(date_format='%d/%m/%Y'),
+            'read_date': DateTimeInput(format='%Y-%m-%d %H:%M', attrs={
+                'class': 'datepicker'}),
         }

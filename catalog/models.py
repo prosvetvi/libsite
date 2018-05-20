@@ -1,9 +1,11 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 
 class Author(models.Model):
@@ -16,15 +18,21 @@ class Author(models.Model):
         return u'%s %s' % (self.name, self.surname)
 
 
+def file_size(value):  # add this to some file where you can import it from
+    limit = 5 * 1024 * 1024
+    if value.size > limit:
+        raise ValidationError('File too large. Size should not exceed 5 MiB.')
+
+
 class Book(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4,
                           help_text="Unique ID for this particular book across whole library")
     title = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField('date published', default=timezone.now())
     read_date = models.DateTimeField('date reading')
-    authors = models.ManyToManyField(Author)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
     image = models.ImageField(blank=True, null=True)
-    file = models.FileField(blank=True, null=True)
+    file = models.FileField(blank=True, null=True, validators=[file_size])
     can_download = models.BooleanField(default=False)
 
     def __str__(self):

@@ -23,3 +23,4 @@ class BookListView(generic.ListView):
 class BookCreate(CreateView):
     form_class = BookForm
     model = Book
+
