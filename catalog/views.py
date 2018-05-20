@@ -21,5 +21,5 @@ class BookListView(generic.ListView):
 
 class BookCreate(CreateView):
     model = Book
-    fields = ['name', "authors", "image", "file", "read_date"]
+    fields = ['title', "authors", "image", "file", "read_date", "can_download"]
 
