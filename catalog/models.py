@@ -19,15 +19,16 @@ class Author(models.Model):
 class Book(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4,
                           help_text="Unique ID for this particular book across whole library")
-    name = models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
     read_date = models.DateTimeField('date reading')
     authors = models.ManyToManyField(Author)
     image = models.ImageField(blank=True, null=True)
     file = models.FileField(blank=True, null=True)
+    can_download = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
 class Profile(models.Model):
