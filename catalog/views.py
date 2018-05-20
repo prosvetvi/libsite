@@ -2,6 +2,7 @@ from django.views import generic
 from django.core.cache import cache
 from django.views.generic import CreateView
 
+from catalog.forms import BookForm
 from catalog.models import Book
 
 
@@ -20,6 +21,5 @@ class BookListView(generic.ListView):
 
 
 class BookCreate(CreateView):
+    form_class = BookForm
     model = Book
-    fields = ['title', "authors", "image", "file", "read_date", "can_download"]
-
