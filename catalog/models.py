@@ -1,3 +1,5 @@
+import os
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
@@ -6,7 +8,7 @@ from django.core.cache import cache
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils import timezone
+from django.utils.timezone import now
 
 
 class Author(models.Model):
@@ -25,15 +27,21 @@ def file_size(value):  # add this to some file where you can import it from
         raise ValidationError('File too large. Size should not exceed 5 MiB.')
 
 
+def get_upload_path_book(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (os.path.splitext(filename)[0] + "_" + str(instance.uuid), ext)
+    return os.path.join('files/' + str(instance.author) + "/", filename)
+
+
 class Book(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4,
-                          help_text="Unique ID for this particular book across whole library")
+                            help_text="Unique ID for this particular book across whole library")
     title = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published', default=timezone.now())
+    pub_date = models.DateTimeField('date published', default=now())
     read_date = models.DateTimeField('date reading')
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     image = models.ImageField(blank=True, null=True)
-    file = models.FileField(blank=True, null=True, validators=[file_size])
+    file = models.FileField(blank=True, null=True, validators=[file_size], upload_to=get_upload_path_book)
     can_download = models.BooleanField(default=False)
 
     def __str__(self):
