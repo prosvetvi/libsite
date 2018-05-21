@@ -8,7 +8,7 @@ from django.core.cache import cache
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.timezone import now
+from django.utils import timezone
 
 
 class Author(models.Model):
@@ -43,7 +43,7 @@ class Book(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4,
                             help_text="Unique ID for this particular book across whole library")
     title = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published', default=now())
+    pub_date = models.DateTimeField('date published', default=timezone.now)
     read_date = models.DateTimeField('date reading')
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     image = models.ImageField(blank=True, null=True, upload_to=get_upload_path_image)
