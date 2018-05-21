@@ -1,6 +1,6 @@
 from django.views import generic
 from django.core.cache import cache
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 
 from catalog.forms import BookForm
 from catalog.models import Book
@@ -32,6 +32,10 @@ class BookListView(generic.ListView):
 
 
 class BookCreate(CreateView):
-    form_class = BookForm
     model = Book
+    form_class = BookForm
 
+
+class BookUpdate(UpdateView):
+    model = Book
+    form_class = BookForm
