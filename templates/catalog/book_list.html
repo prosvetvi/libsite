@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% load book_extras %}
-{{ book.image|scale:"128x128" }}
 
 {% block content %}
     <h1>Book List</h1>
@@ -15,7 +14,7 @@
             {% for book in book_list %}
                 <li>
                     {% if book.image %}
-                        <img src="{{ book.image.url }}">
+                        <img src="{{ book.image|scale:"128x128"}}">
                     {% endif %}
                     {{ book.title }}
                     {% if user.is_authenticated %}
