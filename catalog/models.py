@@ -54,6 +54,39 @@ def update_cache(sender, instance, **kwargs):
     cache.set('last_book_list', Book.objects.order_by('-read_date')[:3])
 
 
+@receiver(models.signals.post_delete, sender=Book)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """
+    Deletes file from filesystem
+    when corresponding `Book` object is deleted.
+    """
+    cache.set('last_book_list', Book.objects.order_by('-read_date')[:3])
+    if instance.file:
+        if os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+
+
+@receiver(models.signals.pre_save, sender=Book)
+def auto_delete_file_on_change(sender, instance, **kwargs):
+    """
+    Deletes old file from filesystem
+    when corresponding `Book` object is updated
+    with new file.
+    """
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = Book.objects.get(pk=instance.pk).file
+    except Book.DoesNotExist:
+        return False
+
+    new_file = instance.file
+    if not old_file == new_file:
+        if os.path.isfile(old_file.path):
+            os.remove(old_file.path)
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
