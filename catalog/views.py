@@ -1,6 +1,6 @@
 from django.views import generic
 from django.core.cache import cache
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, DeleteView
 
 from catalog.forms import BookForm
 from catalog.models import Book
@@ -39,3 +39,7 @@ class BookCreate(CreateView):
 class BookUpdate(UpdateView):
     model = Book
     form_class = BookForm
+
+
+class BookDelete(DeleteView):
+    model = Book
