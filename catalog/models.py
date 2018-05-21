@@ -1,4 +1,6 @@
 import os
+import re
+import ntpath
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -9,6 +11,11 @@ from django.core.cache import cache
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 
 class Author(models.Model):
@@ -72,8 +79,12 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
             os.remove(instance.file.path)
     if instance.image:
         if os.path.isfile(instance.image.path):
-            os.remove(instance.image.path)
-
+            file = instance.image.path
+            directory = os.path.dirname(os.path.abspath(file))
+            for f in os.listdir(directory):
+                if re.search(r"" + re.escape(os.path.splitext(ntpath.basename(file))[0]) + "_scale_\d*x\d*\.jpg", f):
+                    os.remove(os.path.join(directory, f))
+            os.remove(file)
 
 
 @receiver(models.signals.pre_save, sender=Book)
