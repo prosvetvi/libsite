@@ -33,6 +33,12 @@ def get_upload_path_book(instance, filename):
     return os.path.join('files/' + str(instance.author) + "/", filename)
 
 
+def get_upload_path_image(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (os.path.splitext(filename)[0] + "_" + str(instance.uuid), ext)
+    return os.path.join('images/' + str(instance.author) + "/", filename)
+
+
 class Book(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4,
                             help_text="Unique ID for this particular book across whole library")
@@ -40,7 +46,7 @@ class Book(models.Model):
     pub_date = models.DateTimeField('date published', default=now())
     read_date = models.DateTimeField('date reading')
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    image = models.ImageField(blank=True, null=True)
+    image = models.ImageField(blank=True, null=True, upload_to=get_upload_path_image)
     file = models.FileField(blank=True, null=True, validators=[file_size], upload_to=get_upload_path_book)
     can_download = models.BooleanField(default=False)
 
@@ -64,6 +70,10 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     if instance.file:
         if os.path.isfile(instance.file.path):
             os.remove(instance.file.path)
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+
 
 
 @receiver(models.signals.pre_save, sender=Book)
@@ -78,6 +88,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
     try:
         old_file = Book.objects.get(pk=instance.pk).file
+        old_image = Book.objects.get(pk=instance.pk).image
     except Book.DoesNotExist:
         return False
 
@@ -85,6 +96,11 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
     if not old_file == new_file:
         if os.path.isfile(old_file.path):
             os.remove(old_file.path)
+
+    new_image = instance.image
+    if not old_image == new_image:
+        if os.path.isfile(old_image.path):
+            os.remove(old_image.path)
 
 
 class Profile(models.Model):
