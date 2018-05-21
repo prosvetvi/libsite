@@ -26,7 +26,7 @@ def file_size(value):  # add this to some file where you can import it from
 
 
 class Book(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4,
+    uuid = models.UUIDField(default=uuid.uuid4,
                           help_text="Unique ID for this particular book across whole library")
     title = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published', default=timezone.now())
