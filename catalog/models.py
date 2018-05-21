@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+from django.core.cache import cache
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -37,6 +38,12 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# method for updating cache
+@receiver(post_save, sender=Book)
+def update_cache(sender, instance, **kwargs):
+    cache.set('last_book_list', Book.objects.order_by('-read_date')[:3])
 
 
 class Profile(models.Model):
